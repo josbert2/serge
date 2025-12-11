@@ -192,6 +192,43 @@ def health_check():
     return jsonify(health_status), 200
 
 
+@app.route('/test_email', methods=["GET", "POST"])
+def test_email():
+    MAIL_ADDRESS = 'joheandroid@gmail.com'
+    MAIL_APP_PW = 'nwaq evwp bcbt eqwz'
+    menus_str = "None"
+    html_content = render_template("email_inquiry.html", 
+                                   name="Test",
+                                   email="test@example.com", 
+                                   phone="123-456-7890", 
+                                   message="This is a test email.",
+                                   number_of_people=5,
+                                   event_date="2025-12-11",
+                                   occasion="Birthday",
+                                   allergies="None",
+                                   menus=menus_str,
+                                   year=datetime.now().year)
+ 
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = f"New Inquiry: {name} - {event_date}"
+    msg["From"] = MAIL_ADDRESS
+    msg["To"] = MAIL_ADDRESS 
+    msg["Reply-To"] = "test@example.com"
+
+    text_content = f"New inquiry from {name}.\n\nDate: {event_date}\nDetails:\nEmail: {email}\nPhone: {phone}\nGuests: {number_of_people}\nOccasion: {ocassion}\nMenus: {menus_str}\n\nMessage:\n{message}"
+    
+    part1 = MIMEText(text_content, "plain")
+    part2 = MIMEText(html_content, "html")
+    
+    msg.attach(part1)
+    msg.attach(part2)
+    
+    connection.starttls()
+    connection.login(MAIL_ADDRESS, MAIL_APP_PW)
+    connection.sendmail(MAIL_ADDRESS, MAIL_ADDRESS, msg.as_string())
+
+
+
 def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -428,10 +465,13 @@ def send_email(name, email, phone, message, number_of_people, event_date, ocassi
     msg.attach(part2)
     
     try:
-         with smtplib.SMTP("smtp.gmail.com") as connection:
-            connection.starttls()
-            connection.login(MAIL_ADDRESS, MAIL_APP_PW)
-            connection.sendmail(MAIL_ADDRESS, email, msg.as_string())
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as connection:
+            if SMTP_SERVER == "smtp.gmail.com":
+                connection.starttls()
+                connection.login(MAIL_ADDRESS, MAIL_APP_PW)
+            
+            # Send to Admin
+            connection.sendmail(MAIL_ADDRESS, MAIL_ADDRESS, msg.as_string())
             print(f"Email sent successfully to admin via {SMTP_SERVER}.")
     except Exception as e:
         print(f"Error sending email: {e}")
