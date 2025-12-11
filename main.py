@@ -166,6 +166,32 @@ with app.app_context():
     db.create_all()
 
 
+# Health Check Endpoint
+@app.route('/health')
+def health_check():
+    """Health check endpoint to verify app and database connection."""
+    from flask import jsonify
+    from sqlalchemy import text
+    
+    health_status = {
+        "status": "healthy",
+        "app": "running",
+        "database": "unknown"
+    }
+    
+    try:
+        # Test database connection
+        db.session.execute(text("SELECT 1"))
+        health_status["database"] = "connected"
+        health_status["database_url"] = app.config['SQLALCHEMY_DATABASE_URI'].split('@')[-1] if '@' in app.config['SQLALCHEMY_DATABASE_URI'] else "sqlite"
+    except Exception as e:
+        health_status["status"] = "unhealthy"
+        health_status["database"] = "disconnected"
+        health_status["error"] = str(e)
+        return jsonify(health_status), 500
+    
+    return jsonify(health_status), 200
+
 
 def admin_only(f):
     @wraps(f)
