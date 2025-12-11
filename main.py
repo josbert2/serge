@@ -197,11 +197,11 @@ def test_email():
     from flask import jsonify
     
     MAIL_ADDRESS = 'joheandroid@gmail.com'
-    MAIL_APP_PW = 'nwaq evwp bcbt eqwz'
+    MAIL_APP_PW = 'uzvi mify rerw gaie'
     SMTP_SERVER = 'smtp.gmail.com'
     SMTP_PORT = 587
     
-    # Test data
+   
     name = "Test User"
     email = "test@example.com"
     phone = "123-456-7890"
@@ -239,7 +239,7 @@ def test_email():
         msg.attach(part1)
         msg.attach(part2)
         
-        # Create SMTP connection
+      
         connection = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         connection.starttls()
         connection.login(MAIL_ADDRESS, MAIL_APP_PW)
@@ -434,7 +434,8 @@ SMTP_PORT = int(os.environ.get("SMTP_PORT", 1025))
 
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
-  
+    
+ 
     all_menus = db.session.execute(db.select(Menu).where(Menu.is_active == True)).scalars().all()
 
     if request.method == "POST":
@@ -444,7 +445,7 @@ def contact():
         selected_menus = request.form.getlist("menus")
         menus_str = ", ".join(selected_menus) if selected_menus else "None"
         
-        # Save to Database
+     
         new_message = ContactMessage(
             name=data["name"],
             email=data["email"],
@@ -459,6 +460,8 @@ def contact():
         )
         db.session.add(new_message)
         db.session.commit()
+
+        
         
         send_email(data["name"], data["email"], data["phone"], data["message"], number_of_people, event_date,data["ocassion"],data["allergies"], selected_menus)
         return render_template("contact.html", msg_sent=True, menus=all_menus, current_user=current_user)
@@ -466,6 +469,10 @@ def contact():
 
 
 def send_email(name, email, phone, message, number_of_people, event_date, ocassion, allergies, menus_interested):
+   
+    SMTP_SERVER = 'smtp.gmail.com'
+    SMTP_PORT = 587
+    
     menus_str = ", ".join(menus_interested) if menus_interested else "None"
     
 
@@ -494,18 +501,14 @@ def send_email(name, email, phone, message, number_of_people, event_date, ocassi
     
     msg.attach(part1)
     msg.attach(part2)
-    
-    try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as connection:
-            if SMTP_SERVER == "smtp.gmail.com":
-                connection.starttls()
-                connection.login(MAIL_ADDRESS, MAIL_APP_PW)
-            
-            # Send to Admin
-            connection.sendmail(MAIL_ADDRESS, MAIL_ADDRESS, msg.as_string())
-            print(f"Email sent successfully to admin via {SMTP_SERVER}.")
-    except Exception as e:
-        print(f"Error sending email: {e}")
+
+ 
+
+    connection = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    connection.starttls()
+    connection.login(MAIL_ADDRESS, MAIL_APP_PW)
+    connection.sendmail(MAIL_ADDRESS, MAIL_ADDRESS, msg.as_string())
+    connection.quit()
 
 
 # -------------------- CONTACT MESSAGES ADMIN --------------------
