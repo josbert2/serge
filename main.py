@@ -504,15 +504,12 @@ def send_email(name, email, phone, message, number_of_people, event_date, ocassi
 
     EMAIL_KEY="miguel.bendito02@gmail.com"
     PASSWORD_KEY="nwaq evwp bcbt eqwz"
-
-    try:
-        connection = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
-        connection.starttls()
-        connection.login(EMAIL_KEY, PASSWORD_KEY)
-        connection.sendmail(EMAIL_KEY, EMAIL_KEY, msg.as_string())
-        connection.quit()
-    except Exception as e:
-        print(f"Error sending email: {str(e)}")
+    
+    connection = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    connection.starttls()
+    connection.login(EMAIL_KEY, PASSWORD_KEY)
+    connection.sendmail(EMAIL_KEY, EMAIL_KEY, msg.as_string())
+    connection.quit()
 
 
 # -------------------- CONTACT MESSAGES ADMIN --------------------
