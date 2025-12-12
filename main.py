@@ -197,7 +197,7 @@ def test_email():
     from flask import jsonify
     
     MAIL_ADDRESS = 'joheandroid@gmail.com'
-    MAIL_APP_PW = 'uzvi mify rerw gaie'
+    MAIL_APP_PW = 'uzvimifyrerwgaie'
     SMTP_SERVER = 'smtp.gmail.com'
     SMTP_PORT = 587
     
